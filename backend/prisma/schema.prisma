@@ -24,7 +24,6 @@ model User {
   updatedAt DateTime  @updatedAt
 }
 
-
 model Event {
   id          Int       @id @default(autoincrement())
   name        String
