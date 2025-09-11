@@ -23,6 +23,23 @@ export const getAllEvents = async (req, res) => {
   }
 };
 
+// Get event by ID 
+export const getEventById = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const event = await prisma.event.update({
+      where: { id: Number(id) },
+      data: { impressions: { increment: 1 } }, 
+    });
+
+    res.json(event);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+};
+
+
 // Create a new event
 export const createEvent = async (req, res) => {
   const { name, venue, time, capacity } = req.body;
@@ -60,7 +77,7 @@ export const updateEvent = async (req, res) => {
   }
 };
 
-
+// Delete an event
 export const deleteEvent = async (req, res) => {
   try {
     const { id } = req.params;

@@ -33,6 +33,7 @@ model Event {
   bookings    Booking[]
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
+  impressions Int     @default(0)
 }
 
 model Booking {

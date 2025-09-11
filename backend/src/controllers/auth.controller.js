@@ -3,6 +3,7 @@ import { hashPassword, comparePassword, generateToken } from "../utils/auth.js";
 
 const prisma = new PrismaClient();
 
+// User registration
 export const register = async (req, res) => {
   const { name, email, password } = req.body;
 
@@ -21,6 +22,7 @@ export const register = async (req, res) => {
   }
 };
 
+// User login
 export const login = async (req, res) => {
   const { email, password } = req.body;
 

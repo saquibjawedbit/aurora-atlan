@@ -2,6 +2,7 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
+// Book an event with capacity check
 export const bookEvent = async (req, res) => {
   const { id } = req.params;
   const userId = req.user.id;
@@ -27,6 +28,8 @@ export const bookEvent = async (req, res) => {
   }
 };
 
+
+// Cancel a booking
 export const cancelBooking = async (req, res) => {
   const { id } = req.params; 
   const userId = req.user.id;
@@ -44,6 +47,7 @@ export const cancelBooking = async (req, res) => {
   }
 };
 
+// Get booking history for the logged-in user
 export const getBookingHistory = async (req, res) => {
   try {
     const bookings = await prisma.booking.findMany({
