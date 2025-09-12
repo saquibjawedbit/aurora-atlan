@@ -1,10 +1,11 @@
 import { Router } from "express";
-import { bookEvent, cancelBooking, getBookingHistory } from "../controllers/booking.controller.js";
+import { bookEvent, cancelBooking, getBookingHistory, getBookingStatusById } from "../controllers/booking.controller.js";
 import { authMiddleware } from "../middleware/auth.js";
 
 const router = Router();
 
 router.post("/:id/book", authMiddleware(["USER", "ADMIN"]), bookEvent);
+router.get("/status/:jobId", getBookingStatusById); // No auth needed for status check
 router.delete("/:id/cancel", authMiddleware(["USER", "ADMIN"]), cancelBooking);
 router.get("/history", authMiddleware(["USER", "ADMIN"]), getBookingHistory);
 

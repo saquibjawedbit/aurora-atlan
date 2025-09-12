@@ -1,30 +1,55 @@
 import { PrismaClient } from "@prisma/client";
+import { addBookingToQueue, getBookingStatus } from "../services/bookingQueue.js";
 
 const prisma = new PrismaClient();
 
-// Book an event with capacity check
+// Book an event using queue-based approach
 export const bookEvent = async (req, res) => {
   const { id } = req.params;
   const userId = req.user.id;
 
   try {
-    const booking = await prisma.$transaction(async (tx) => {
-      const event = await tx.event.findUnique({
-        where: { id: parseInt(id) },
-        include: { bookings: true },
-      });
-
-      if (!event) throw new Error("Event not found");
-      if (event.bookings.length >= event.capacity) throw new Error("Event full");
-
-      return tx.booking.create({
-        data: { userId, eventId: event.id },
-      });
+    // Quick validation before adding to queue
+    const event = await prisma.event.findUnique({
+      where: { id: parseInt(id) },
+      select: { id: true, name: true, capacity: true },
     });
 
-    res.json(booking);
+    if (!event) {
+      return res.status(404).json({ error: "Event not found" });
+    }
+
+    // Add booking request to queue
+    const queueResult = await addBookingToQueue(userId, parseInt(id));
+    
+    res.status(202).json({
+      message: "Booking request queued successfully",
+      jobId: queueResult.jobId,
+      queuePosition: queueResult.position,
+      estimatedWaitTime: `${queueResult.estimatedWaitTime} seconds`,
+      statusEndpoint: `/api/bookings/status/${queueResult.jobId}`,
+    });
   } catch (err) {
-    res.status(400).json({ error: err.message });
+    console.error("Error queuing booking:", err);
+    res.status(500).json({ error: "Failed to queue booking request" });
+  }
+};
+
+// Get booking status by job ID
+export const getBookingStatusById = async (req, res) => {
+  const { jobId } = req.params;
+
+  try {
+    const status = await getBookingStatus(jobId);
+    
+    if (status.status === 'not_found') {
+      return res.status(404).json({ error: "Booking job not found" });
+    }
+
+    res.json(status);
+  } catch (err) {
+    console.error("Error getting booking status:", err);
+    res.status(500).json({ error: "Failed to get booking status" });
   }
 };
 

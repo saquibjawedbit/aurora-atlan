@@ -1,4 +1,6 @@
 import { PrismaClient } from "@prisma/client";
+import { getQueueStats, getQueueDetails, cleanQueue, pauseQueue, resumeQueue, getQueueHealth } from "../services/queueMonitor.js";
+
 const prisma = new PrismaClient();
 
 export const getAnalytics = async (req, res) => {
@@ -36,6 +38,57 @@ export const getAnalytics = async (req, res) => {
       popularEvents,
       utilization,
     });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+// Queue management endpoints
+export const getQueueStatistics = async (req, res) => {
+  try {
+    const stats = await getQueueStats();
+    const health = await getQueueHealth();
+    
+    res.json({
+      stats,
+      health,
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+export const getQueueInfo = async (req, res) => {
+  try {
+    const details = await getQueueDetails();
+    res.json(details);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+export const clearQueue = async (req, res) => {
+  try {
+    const result = await cleanQueue();
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+export const pauseBookingQueue = async (req, res) => {
+  try {
+    const result = await pauseQueue();
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+export const resumeBookingQueue = async (req, res) => {
+  try {
+    const result = await resumeQueue();
+    res.json(result);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
