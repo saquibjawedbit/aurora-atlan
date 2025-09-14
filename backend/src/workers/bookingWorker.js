@@ -4,6 +4,7 @@ import redis from '../configs/redis.js';
 
 const prisma = new PrismaClient();
 
+
 // Process booking jobs
 bookingQueue.process('processBooking', 1, async (job) => {
   const { userId, eventId, jobId } = job.data;
