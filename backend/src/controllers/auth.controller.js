@@ -18,6 +18,7 @@ export const register = async (req, res) => {
 
     res.json({ user, token: generateToken(user) });
   } catch (err) {
+    console.log(err);
     res.status(500).json({ error: err.message });
   }
 };
