@@ -13,7 +13,7 @@ bookingQueue.process('processBooking', 1, async (job) => {
   
   try {
     // Update job status to processing
-    await redis.setex(`booking:${jobId}`, 300, JSON.stringify({
+    await redis.setex(`booking:${jobId}`, 900, JSON.stringify({
       status: 'processing',
       userId,
       eventId,
